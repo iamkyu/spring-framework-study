@@ -5,8 +5,6 @@
 예제 소스를 따라해 본 것은  github에  각 챕터별로 branch를 나눠 커밋하고 있다. (`Java8`, `Spring4.2`)
 > [https://github.com/iamkyu/spring-framework-study/tree/chap03](https://github.com/iamkyu/spring-framework-study/tree/chap03)
 
----
-
 ## 단위 테스트(Unit Test)
 
 일반적인 웹 애플리케이션 개발에서 DAO를 테스트하기 위해서는 서비스, 컨트롤, 뷰 까지 모든 레이어가 완성
@@ -14,8 +12,6 @@
 
 - 단위의 범위는 정형화 되어 있지 않지만 작을 수록 좋다.
 - 테스트 검증의 자동화를 구현하여 빠르게 테스트 한다.
-
----
 
 ## 테스트 주도 개발: TDD (또는 테스트 우선 개발: TFD)
 
@@ -56,8 +52,6 @@ public void setUp() {
 	// code
 }
 ```
-
----
 
 ## 테스트의 또 다른 활용
 
