@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.domain.User;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -78,5 +79,13 @@ public class UserDaoTest {
         assertThat(dao.getCount(), is(0));
 
         dao.get("unknown_id");
+    }
+
+    @Test
+    public void getAll () {
+        dao.deleteAll();
+
+        List<User> users0 = dao.getAll();
+        assertThat(users0 .size(), is(0));
     }
 }

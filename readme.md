@@ -1,59 +1,45 @@
-# 2장. 테스트
+# 3장. 템플릿
 
 > [토비의 스프링 3.1](http://book.naver.com/bookdb/book_detail.nhn?bid=7006516) (이일민 저. 에이콘출판. 2010) 을 공부하며 책 내용 중 일부를 요약.
 
 예제 소스를 따라해 본 것은  github에  각 챕터별로 branch를 나눠 커밋하고 있다. (`Java8`, `Spring4.2`)
 > [https://github.com/iamkyu/spring-framework-study/tree/chap03](https://github.com/iamkyu/spring-framework-study/tree/chap03)
 
-## 단위 테스트(Unit Test)
+## 템플릿메소드 패턴
 
-일반적인 웹 애플리케이션 개발에서 DAO를 테스트하기 위해서는 서비스, 컨트롤, 뷰 까지 모든 레이어가 완성
-되어야 하는 문제가 있음. 테스트 하고자 하는 대상에만 집중하여 방법에는 단위 테스트를 활용할 수 있음.
+> 템플릿: 코드에서 변경이 거의 일어나지 않으며 일정한 패턴을 패턴으로 유지되는 특성을 가진 부분을 독립시켜 효과적으로 활용할 수 있도록 하는 방법.
 
-- 단위의 범위는 정형화 되어 있지 않지만 작을 수록 좋다.
-- 테스트 검증의 자동화를 구현하여 빠르게 테스트 한다.
+변하지 않는 부분은 슈퍼클래스에 두고 변하는 부분은 추상 메소드로 정의해서 상속을 통해 기능을 확장하는 패턴.
 
-## 테스트 주도 개발: TDD (또는 테스트 우선 개발: TFD)
+### 장점
 
-> 실패한 테스트를 성공시키기 위한 목적이 아닌 코드는 만들지 않는다.
+- 슈퍼클래스의 기능을 확장하고 싶을 때마다 상속을 통해 자유롭게 확장 가능
+- 확장으로 인해 슈퍼클래스의 불필요한 변화가 생기지 않음
 
-`테스트코드` > `테스트실패` > `구현` > `테스트통과` > `개선` 의 사이클을 따르며 자연스럽게 모든 코드는 빠짐 없이 테스트로 검증. 사이클의 주기는 가능한 빠르게 한다.
+### 단점
 
-### JUnit을 통한 단위 테스트
+- 로직마다 상속을 통해 새로운 클래스를 만들어야 함
+- 확장 구조가 클래스를 설계하는 시점에 고정되어 버림
 
-```java
-import org.junit.Test;
+## 전략 패턴
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+오브젝트를 완전히 분리하고 클래스 레벨에서는 인터페이스를 통해서만 의존하도록 만드는 전략 패턴. 바뀌지 않는 부분은 컨텍스트로, 바뀌는 부분은 전략으로 만들고 인터페이스를 통해 유연하게 전략을 변경할 수 있다.
 
-public class UserDaoTest {
-    @Test
-    public void addAndGet() throws SQLException {
-    	// 테스트코드
-        // (중략)
-        assertThat(user2.getName(), is(user.getName()));
-        assertThat(user2.getPassword(), is(user.getPassword()));
-	}
-}
-```
+### 장점
+- 템플릿메소드 패턴보다 유연하고 확장성이 뛰어남
+- 필요에 따라 컨텍스트는 그대로 유지되며 전략을 바꿔 쓸 수 있음
 
-예외상황에 대한 테스트는 아래 코드와 같이 어노테이션 부분에 예상 되는 예외를 명시한다. 해당 메소드를 테스트할 때 명시 된 예외가 발생해야 성공하는 테스트가 된다.
+## 탬플릿/콜백 패턴
 
-```java
-@Test(expected = EmptyResultDataAccessException.class)
-```
+전략 패턴의 기본 구조에 익명 내부 클래스를 활용한 방식. 전략 패턴의 전략과 달리 단일 메소드 인페이스 사용.
 
-`@Before` 어노테이션이 붙은 메소드는  `@Test` 어노테이션이 붙은 메소드 이전에 실행 된다. 하나의 클래스 안에 여러 개의 테스트 메소드가 있을 때, 공통 세팅을 준비할 때 유용. `@After` 어노테이션의 경우 `@Test` 어노테이션이 붙은 메소드 이후에 실행 된다.
+### 장점
 
-```java
-@Before
-public void setUp() {
-	// code
-}
-```
+- 전략 패턴과 DI의 장점을 익명 내부 클래스 사용 전략과 결합한 독특한 활용법
 
-## 테스트의 또 다른 활용
+스프링 프레임워크는 JDBC 코드 작성을 위해 JdbcTemplate을 기반으로 하는 다양한 템플릿과 콜백을 제공한다.
 
-- 특정 프레임워크, 기술 등을 공부하기 위한 학습 테스트
-- 코드에 오류가 있을 때 그 오류를 재현 하는 버그 테스트
+- update()
+- queryForInt() *(queryForInt()와 queryForLong()은 스프링 버전 3.2.2부터 deprecated)*
+- queryForObject()
+- query
