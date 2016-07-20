@@ -5,11 +5,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.domain.User;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -22,6 +24,9 @@ public class UserDaoTest {
 
     @Autowired
     private ApplicationContext context;
+
+    @Autowired
+    DataSource dataSource;
 
     private UserDao dao;
     private User user1;
@@ -88,4 +93,31 @@ public class UserDaoTest {
         List<User> users0 = dao.getAll();
         assertThat(users0 .size(), is(0));
     }
+
+    @Test(expected = DataAccessException.class)
+    public void duplicateKey() throws Exception {
+        dao.deleteAll();
+
+        dao.add(user1);
+        dao.add(user1);
+    }
+
+
+    /* Not Working java: <T>is(java.lang.Class<T>) in org.hamcrest.Matchers has been deprecated
+
+    @Test
+    public void sqlExceptionTranslate() {
+        dao.deleteAll();
+
+        try {
+            dao.add(user1);
+            dao.add(user2);
+        } catch (DuplicateKeyException e) {
+            SQLException sqlEx = (SQLException) e.getRootCause();
+            SQLExceptionTranslator set = new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
+            assertThat(set.translate(null, null, sqlEx), is(DuplicateKeyException.class));
+        }
+    }
+    */
+
 }
