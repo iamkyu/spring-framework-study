@@ -18,7 +18,7 @@
     </bean>
 
 
-    <jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
+    <jdbc:initialize-database data-source="dataSource" ignore-failures="DROPS">
         <jdbc:script location="classpath:/ddl-for-mysql.sql"/>
     </jdbc:initialize-database>
 
