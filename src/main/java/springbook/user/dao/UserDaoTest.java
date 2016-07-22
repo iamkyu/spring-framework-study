@@ -60,6 +60,16 @@ public class UserDaoTest {
         checkSameUser(userGet2, user2);
     }
 
+    private void checkSameUser(User user1, User user2) {
+        assertThat(user1.getId(), is(user2.getId()));
+        assertThat(user1.getName(), is(user2.getName()));
+        assertThat(user1.getPassword(), is(user2.getPassword()));
+        assertThat(user1.getLevel(), is(user2.getLevel()));
+        assertThat(user1.getLogin(), is(user2.getLogin()));
+        assertThat(user1.getRecommend(), is(user2.getRecommend()));
+    }
+
+
     @Test
     public void count() throws SQLException, ClassNotFoundException {
         dao.deleteAll();
@@ -102,14 +112,22 @@ public class UserDaoTest {
         dao.add(user1);
     }
 
-    private void checkSameUser(User user1, User user2) {
-        assertThat(user1.getId(), is(user2.getId()));
-        assertThat(user1.getName(), is(user2.getName()));
-        assertThat(user1.getPassword(), is(user2.getPassword()));
-        assertThat(user1.getLevel(), is(user2.getLevel()));
-        assertThat(user1.getLogin(), is(user2.getLogin()));
-        assertThat(user1.getRecommend(), is(user2.getRecommend()));
+    @Test
+    public void update() {
+        dao.deleteAll();
+        dao.add(user1);
+
+        user1.setName("new1");
+        user1.setPassword("newuser1");
+        user1.setLevel(Level.GOLD);
+        user1.setLogin(1000);
+        user1.setRecommend(999);
+        dao.update(user1);
+
+        User user1update = dao.get(user1.getId());
+        checkSameUser(user1, user1update);
     }
+
 
 
     /* Not Working java: <T>is(java.lang.Class<T>) in org.hamcrest.Matchers has been deprecated
