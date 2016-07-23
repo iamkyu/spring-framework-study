@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.PlatformTransactionManager;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
@@ -30,6 +31,9 @@ import static springbook.user.service.UserService.MIN_RECCOMEND_FOR_GOLD;
 public class UserServiceTest {
     @Autowired
     private ApplicationContext context;
+
+    @Autowired
+    PlatformTransactionManager transactionManager;
 
     @Autowired
     DataSource dataSource;
@@ -105,7 +109,7 @@ public class UserServiceTest {
     public void upgradeAllOrNothing() throws Exception {
         UserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
-        testUserService.setDataSource(this.dataSource);
+        testUserService.setTransactionManager(transactionManager);
 
         userDao.deleteAll();
         for (User user : users) userDao.add(user);
