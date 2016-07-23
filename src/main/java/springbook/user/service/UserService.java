@@ -11,6 +11,9 @@ import java.util.List;
  * @since 2016-07-23
  */
 public class UserService {
+    public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
+    public static final int MIN_RECCOMEND_FOR_GOLD = 30;
+
     UserDao userDao;
 
     public void setUserDao(UserDao userDao) {
