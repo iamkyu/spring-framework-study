@@ -30,13 +30,13 @@ public class UserServiceTest {
     @Autowired
     UserService userService;
 
-    private UserDao dao;
+    private UserDao userDao;
 
     List<User> users;
 
     @Before
     public void setUp() {
-        this.dao = context.getBean("userDao", UserDao.class);
+        this.userDao = context.getBean("userDao", UserDao.class);
 
         users = Arrays.asList(
             new User("test1", "tester1", "pass1", Level.BASIC, 49, 0),
@@ -48,11 +48,29 @@ public class UserServiceTest {
     }
 
     @Test
+    public void add() {
+        userDao.deleteAll();
+
+        User userWithLevel = users.get(4);
+        User userWithoutLevel = users.get(0);
+        userWithLevel.setLevel(null);
+
+        userService.add(userWithLevel);
+        userService.add(userWithoutLevel);
+
+        User userWithLevelRead = userDao.get(userWithLevel.getId());
+        User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
+
+        assertThat(userWithLevelRead.getLevel(), is(userWithLevel.getLevel()));
+        assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
+    }
+
+    @Test
     public void upgradeLevels() {
-        dao.deleteAll();
+        userDao.deleteAll();
 
         for (User user : users)
-            dao.add(user);
+            userDao.add(user);
 
         userService.upgradeLevels();
         checkLevel(users.get(0), Level.BASIC);
@@ -63,7 +81,7 @@ public class UserServiceTest {
     }
 
     private void checkLevel(User user, Level expectedLevel) {
-        User userUpgrade = dao.get(user.getId());
+        User userUpgrade = userDao.get(user.getId());
         assertThat(userUpgrade.getLevel(), is(expectedLevel));
     }
 }

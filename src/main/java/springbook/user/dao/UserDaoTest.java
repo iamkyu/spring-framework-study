@@ -29,14 +29,14 @@ public class UserDaoTest {
     @Autowired
     DataSource dataSource;
 
-    private UserDao dao;
+    private UserDao userDao;
     private User user1;
     private User user2;
     private User user3;
 
     @Before
     public void setUp() {
-        this.dao = context.getBean("userDao", UserDao.class);
+        this.userDao = context.getBean("userDao", UserDao.class);
 
         this.user1 = new User("test1", "tester1", "pass1", Level.BASIC, 1, 0);
         this.user2 = new User("test2", "tester2", "pass2", Level.SILVER, 55, 10);
@@ -45,17 +45,17 @@ public class UserDaoTest {
 
     @Test
     public void addAndGet() throws SQLException, ClassNotFoundException {
-        dao.deleteAll();
-        assertThat(dao.getCount(), is(0));
+        userDao.deleteAll();
+        assertThat(userDao.getCount(), is(0));
 
-        dao.add(user1);
-        dao.add(user2);
-        assertThat(dao.getCount(), is(2));
+        userDao.add(user1);
+        userDao.add(user2);
+        assertThat(userDao.getCount(), is(2));
 
-        User userGet1 = dao.get(user1.getId());
+        User userGet1 = userDao.get(user1.getId());
         checkSameUser(userGet1, user1);
 
-        User userGet2 = dao.get(user2.getId());
+        User userGet2 = userDao.get(user2.getId());
         assertThat(userGet2.getName(), is(user2.getName()));
         checkSameUser(userGet2, user2);
     }
@@ -72,62 +72,62 @@ public class UserDaoTest {
 
     @Test
     public void count() throws SQLException, ClassNotFoundException {
-        dao.deleteAll();
-        assertThat(dao.getCount(), is(0));
+        userDao.deleteAll();
+        assertThat(userDao.getCount(), is(0));
 
-        dao.add(user1);
-        assertThat(dao.getCount(), is(1));
+        userDao.add(user1);
+        assertThat(userDao.getCount(), is(1));
 
-        dao.add(user2);
-        assertThat(dao.getCount(), is(2));
+        userDao.add(user2);
+        assertThat(userDao.getCount(), is(2));
 
-        dao.add(user3);
-        assertThat(dao.getCount(), is(3));
+        userDao.add(user3);
+        assertThat(userDao.getCount(), is(3));
 
-        dao.deleteAll();
-        assertThat(dao.getCount(), is(0));
+        userDao.deleteAll();
+        assertThat(userDao.getCount(), is(0));
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void getUserFailure() throws SQLException, ClassNotFoundException {
-        dao.deleteAll();
-        assertThat(dao.getCount(), is(0));
+        userDao.deleteAll();
+        assertThat(userDao.getCount(), is(0));
 
-        dao.get("unknown_id");
+        userDao.get("unknown_id");
     }
 
     @Test
     public void getAll () {
-        dao.deleteAll();
+        userDao.deleteAll();
 
-        List<User> users0 = dao.getAll();
+        List<User> users0 = userDao.getAll();
         assertThat(users0 .size(), is(0));
     }
 
     @Test(expected = DataAccessException.class)
     public void duplicateKey() throws Exception {
-        dao.deleteAll();
+        userDao.deleteAll();
 
-        dao.add(user1);
-        dao.add(user1);
+        userDao.add(user1);
+        userDao.add(user1);
     }
 
     @Test
     public void update() {
-        dao.deleteAll();
-        dao.add(user1);
-        dao.add(user2);
+        userDao.deleteAll();
+        userDao.add(user1);
+        userDao.add(user2);
 
         user1.setName("new1");
         user1.setPassword("newuser1");
         user1.setLevel(Level.GOLD);
         user1.setLogin(1000);
         user1.setRecommend(999);
-        dao.update(user1);
+        userDao.update(user1);
 
-        User user1update = dao.get(user1.getId());
+        User user1update = userDao.get(user1.getId());
         checkSameUser(user1, user1update);
-        User user2same = dao.get(user2.getId());
+        User user2same = userDao.get(user2.getId());
         checkSameUser(user2, user2same);
     }
 
@@ -137,11 +137,11 @@ public class UserDaoTest {
 
     @Test
     public void sqlExceptionTranslate() {
-        dao.deleteAll();
+        userDao.deleteAll();
 
         try {
-            dao.add(user1);
-            dao.add(user2);
+            userDao.add(user1);
+            userDao.add(user2);
         } catch (DuplicateKeyException e) {
             SQLException sqlEx = (SQLException) e.getRootCause();
             SQLExceptionTranslator set = new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
