@@ -6,7 +6,6 @@ import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,67 +76,24 @@ public class UserServiceImpl implements UserService {
         if (user.getLevel() == null) user.setLevel(Level.BASIC);
         userDao.add(user);
     }
-}
-
-
-class TestUserService extends UserServiceImpl {
-    private String id;
-
-    public TestUserService(String id) {
-        this.id = id;
-    }
 
     @Override
-    protected void upgradeLevel(User user) {
-        if (user.getId().equals(this.id)) throw new TestUserServiceException();
-
-        super.upgradeLevel(user);
-    }
-}
-
-class TestUserServiceException extends RuntimeException {
-
-}
-
-class MockUserDao implements UserDao {
-    private List<User> users;
-    private List<User> updated = new ArrayList<>();
-
-    public MockUserDao(List<User> users) {
-        this.users = users;
-    }
-
-    public List<User> getUpdated() {
-        return this.updated;
+    public User get(String id) {
+        return userDao.get(id);
     }
 
     @Override
     public List<User> getAll() {
-        return this.users;
-    }
-
-    @Override
-    public void update(User user) {
-        updated.add(user);
-    }
-
-    @Override
-    public void add(User user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public User get(String id) {
-        throw new UnsupportedOperationException();
+        return userDao.getAll();
     }
 
     @Override
     public void deleteAll() {
-        throw new UnsupportedOperationException();
+        userDao.deleteAll();
     }
 
     @Override
-    public int getCount() {
-        throw new UnsupportedOperationException();
+    public void update(User user) {
+        userDao.update(user);
     }
 }
