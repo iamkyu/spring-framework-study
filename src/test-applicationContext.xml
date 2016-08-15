@@ -13,40 +13,37 @@
                     http://www.springframework.org/schema/tx
                     http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-    <bean id="testUserService" class="springbook.user.service.UserServiceTest$TestUserServiceImpl" parent="userService" />
+    <bean id="testUserService"
+          class="springbook.user.service.UserServiceTest$TestUserServiceImpl"
+          parent="userService" />
 
     <tx:annotation-driven />
-
     <tx:advice id="transactionAdvice">
         <tx:attributes>
             <tx:method name="*" />
         </tx:attributes>
     </tx:advice>
 
-    <bean id="userService" class="springbook.user.service.UserServiceImpl">
-        <property name="userDao" ref="userDao"/>
-        <property name="mailSender" ref="mailSender"/>
-    </bean>
-
-    <bean id="userDao" class="springbook.user.dao.UserDaoJdbc">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
-
-    <bean id="transactionPointcut" class="org.springframework.aop.aspectj.AspectJExpressionPointcut">
-        <property name="expression" value="execution(* *..*ServiceImpl.upgrade*(..))" />
-    </bean>
 
     <aop:config>
         <aop:advisor advice-ref="transactionAdvice" pointcut="bean(*Service)" />
     </aop:config>
 
+    <bean id="userService" class="springbook.user.service.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+        <property name="mailSender" ref="mailSender"/>
+    </bean>
+
     <bean id="mailSender" class="springbook.user.service.DummyMailSender"/>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="userDao" class="springbook.user.dao.UserDaoJdbc">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
         <property name="driverClass" value="org.h2.Driver"/>
@@ -55,14 +52,7 @@
         <property name="password" value="sa"/>
     </bean>
 
-    <bean id="message" class="springbook.learningtest.spring.factorybean.MessageFactoryBean">
-        <property name="text" value="Factory Bean"/>
-    </bean>
-
-
     <jdbc:initialize-database data-source="dataSource" ignore-failures="DROPS">
         <jdbc:script location="classpath:/ddl-for-mysql.sql"/>
     </jdbc:initialize-database>
-
-
 </beans>

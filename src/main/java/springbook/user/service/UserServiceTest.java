@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
@@ -50,7 +52,8 @@ public class UserServiceTest {
     @Autowired
     MailSender mailSender;
 
-    private UserDao userDao;
+    @Autowired
+    UserDao userDao;
 
     List<User> users;
 
@@ -145,7 +148,20 @@ public class UserServiceTest {
 
     @Test(expected = TransientDataAccessResourceException.class)
     public void readOnlyTransactionAttribute() {
+        for (User user : users) {
+            userService.add(user);
+        }
+
         testUserService.getAll();
+    }
+
+    @Test
+    @Transactional(readOnly = true)
+    @Rollback(false)
+    public void transactionSync() {
+        userService.deleteAll();
+        userService.add(users.get(0));
+        userService.add(users.get(1));
     }
 
 
@@ -167,7 +183,7 @@ public class UserServiceTest {
     }
 
     static class TestUserServiceException extends RuntimeException {
-
+        private static final long serialVersionUID = 1L;
     }
 
     static class MockUserDao implements UserDao {
