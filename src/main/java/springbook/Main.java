@@ -10,6 +10,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.User;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Kj Nam
  * @since 2016-11-26
@@ -36,5 +38,8 @@ public class Main {
         user.setPassword("password");
 
         dao.add(user);
+
+        User user2 = dao.get(user.getId());
+        assertEquals(user.getId(), user2.getId());
     }
 }
