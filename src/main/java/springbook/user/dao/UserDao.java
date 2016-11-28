@@ -1,5 +1,6 @@
 package springbook.user.dao;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import springbook.user.domain.User;
 
 import javax.sql.DataSource;
@@ -20,36 +21,73 @@ public class UserDao {
         this.dataSource = dataSource;
     }
 
-    public void add(User user) throws Exception {
+    public void add(User user) throws ClassNotFoundException, SQLException {
         Connection c = dataSource.getConnection();
 
-        PreparedStatement pstmt = c.prepareStatement("INSERT INTO USERS(id, name, password) VALUES(?,?,?)");
-        pstmt.setString(1, user.getId());
-        pstmt.setString(2, user.getId());
-        pstmt.setString(3, user.getId());
-        pstmt.executeUpdate();
+        PreparedStatement ps = c.prepareStatement(
+                "insert into users(id, name, password) values(?, ?, ?)");
 
-        pstmt.close();
+        ps.setString(1, user.getId());
+        ps.setString(2, user.getName());
+        ps.setString(3, user.getPassword());
+
+        ps.executeUpdate();
+
+        ps.close();
         c.close();
     }
 
-    public User get(String userId) throws SQLException {
+    public User get(String id) throws ClassNotFoundException, SQLException {
         Connection c = dataSource.getConnection();
 
-        PreparedStatement pstmt = c.prepareStatement("SELECT * FROM USERS WHERE id = ?");
-        pstmt.setString(1, userId);
+        PreparedStatement ps = c.prepareStatement(
+                "select * from users where id = ?");
 
-        ResultSet rs = pstmt.executeQuery();
-        rs.next();
-        User user = new User();
-        user.setId(rs.getString("id"));
-        user.setName(rs.getString("name"));
-        user.setPassword(rs.getString("password"));
+        ps.setString(1, id);
+
+        ResultSet rs = ps.executeQuery();
+
+        User user = null;
+        if (rs.next()) {
+            user = new User();
+            user.setId(rs.getString("id"));
+            user.setName(rs.getString("name"));
+            user.setPassword(rs.getString("password"));
+        }
 
         rs.close();
-        pstmt.close();
+        ps.close();
         c.close();
 
+        if (user == null) throw new EmptyResultDataAccessException(1);
+
         return user;
+    }
+
+    public void deleteAll() throws SQLException {
+        Connection c = dataSource.getConnection();
+
+        PreparedStatement ps = c.prepareStatement(
+                "delete from users");
+        ps.executeUpdate();
+
+        ps.close();
+        c.close();
+    }
+
+    public int getCount() throws SQLException {
+        Connection c = dataSource.getConnection();
+
+        PreparedStatement ps = c.prepareStatement(
+                "select count(*) from users");
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        int count = rs.getInt(1);
+
+        rs.close();
+        ps.close();
+        c.close();
+
+        return count;
     }
 }
