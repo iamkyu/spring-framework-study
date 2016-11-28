@@ -70,8 +70,9 @@ public class UserDao {
 
         try {
             c = dataSource.getConnection();
-            ps = c.prepareStatement("delete from users");
-            ps.executeUpdate();
+
+            StatementStretegy stretegy = new DeleteAllStatement();
+            ps = stretegy.makeStatemnt(c);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
