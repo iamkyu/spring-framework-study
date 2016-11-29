@@ -40,4 +40,14 @@ public class JdbcContext {
             }
         }
     }
+
+    public void executeSql(String query, UserDao userDao) throws SQLException {
+        workWithStatementStrategy(
+                new StatementStretegy() {
+            @Override
+            public PreparedStatement makeStatemnt(Connection c) throws SQLException {
+                return c.prepareStatement(query);
+            }
+        });
+    }
 }
