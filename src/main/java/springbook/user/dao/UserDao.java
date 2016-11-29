@@ -71,8 +71,8 @@ public class UserDao {
         try {
             c = dataSource.getConnection();
 
-            StatementStretegy stretegy = new DeleteAllStatement();
-            ps = stretegy.makeStatemnt(c);
+            StatementStretegy st = new DeleteAllStatement();
+            jdbcContextWithStatementStrategy(st);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -106,5 +106,34 @@ public class UserDao {
         c.close();
 
         return count;
+    }
+
+    public void jdbcContextWithStatementStrategy(StatementStretegy st) throws SQLException {
+        Connection c = null;
+        PreparedStatement ps = null;
+
+        try {
+            c = dataSource.getConnection();
+            ps = st.makeStatemnt(c);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
