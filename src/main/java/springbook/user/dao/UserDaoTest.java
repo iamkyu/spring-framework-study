@@ -1,5 +1,6 @@
 package springbook.user.dao;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,9 +41,13 @@ public class UserDaoTest {
         this.user3 = new User("test3", "tester3", "pass3");
     }
 
+    @After
+    public void tearDown() throws SQLException {
+        dao.deleteAll();
+    }
+
     @Test
     public void addAndGet() throws SQLException, ClassNotFoundException {
-        dao.deleteAll();
         assertThat(dao.getCount(), is(0));
 
         dao.add(user1);
@@ -60,7 +65,6 @@ public class UserDaoTest {
 
     @Test
     public void count() throws SQLException, ClassNotFoundException {
-        dao.deleteAll();
         assertThat(dao.getCount(), is(0));
 
         dao.add(user1);
@@ -78,7 +82,6 @@ public class UserDaoTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void getUserFailure() throws SQLException, ClassNotFoundException {
-        dao.deleteAll();
         assertThat(dao.getCount(), is(0));
 
         dao.get("unknown_id");
