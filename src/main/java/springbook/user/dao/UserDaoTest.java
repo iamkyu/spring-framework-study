@@ -6,11 +6,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.domain.User;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -27,6 +29,9 @@ public class UserDaoTest {
 
     @Autowired
     private ApplicationContext context;
+
+    @Autowired
+    DataSource dataSource;
 
     private UserDao dao;
     private User user1;
@@ -112,6 +117,12 @@ public class UserDaoTest {
         checkSameUser(user1, users3.get(0));
         checkSameUser(user2, users3.get(1));
         checkSameUser(user3, users3.get(2));
+    }
+
+    @Test(expected = DuplicateKeyException.class)
+    public void duplicateKey() throws SQLException, ClassNotFoundException {
+        dao.add(user1);
+        dao.add(user1);
     }
 
     private void checkSameUser(User user1, User user2) {
