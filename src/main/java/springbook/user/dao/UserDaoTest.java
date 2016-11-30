@@ -12,12 +12,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
+import springbook.user.service.UserService;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 
 /**
@@ -34,6 +36,9 @@ public class UserDaoTest {
     @Autowired
     DataSource dataSource;
 
+    @Autowired
+    UserService userService;
+
     private UserDao dao;
     private User user1;
     private User user2;
@@ -46,6 +51,11 @@ public class UserDaoTest {
         this.user1 = new User("test1", "tester1", "pass1", Level.BASIC, 1, 0);
         this.user2 = new User("test2", "tester2", "pass2", Level.SILVER, 55, 10);
         this.user3 = new User("test3", "tester3", "pass3", Level.GOLD, 100, 40);
+    }
+
+    @Test
+    public void userServiceBean() {
+        assertThat(userService, is(notNullValue()));
     }
 
     @After

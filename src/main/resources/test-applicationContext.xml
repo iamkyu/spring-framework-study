@@ -13,8 +13,13 @@
     <bean id="userDao" class="springbook.user.dao.UserDaoJdbc">
         <property name="dataSource" ref="dataSource"/>
     </bean>
+
     <bean id="jdbcContext" class="springbook.user.dao.JdbcContext">
         <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="UserService" class="springbook.user.service.UserService">
+        <property name="userDao" ref="userDao"/>
     </bean>
 
     <jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
