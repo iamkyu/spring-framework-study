@@ -19,4 +19,6 @@ public interface UserDao {
     int getCount() throws SQLException;
 
     List<User> getAll();
+
+    void update(User user1);
 }

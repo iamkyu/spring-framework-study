@@ -39,6 +39,11 @@ public class UserDaoJdbc implements UserDao {
                 user.getId(), user.getName(), user.getPassword(), user.getLevel().intValue(), user.getRecommend(), user.getLogin());
     }
 
+    @Override
+    public void update(User user) {
+        this.jdbcTemplate.update("update users set name=?, password=?, level=?, recommend=?, login=? where id=?",
+                user.getName(), user.getPassword(), user.getLevel().intValue(), user.getRecommend(), user.getLogin(), user.getId());
+    }
 
     @Override
     public User get(String id) throws ClassNotFoundException, SQLException {
