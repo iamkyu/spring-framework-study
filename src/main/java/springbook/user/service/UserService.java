@@ -1,5 +1,7 @@
 package springbook.user.service;
 
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -22,12 +24,18 @@ public class UserService implements UserLevelUpgradedPolicy {
 
     private PlatformTransactionManager transactionManager;
 
+    private MailSender mailSender;
+
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
     }
 
     public void upgradeLevels() throws SQLException {
@@ -52,6 +60,18 @@ public class UserService implements UserLevelUpgradedPolicy {
     public void upgradeLevel(User user) {
         user.upgradeLevel();
         userDao.update(user);
+        sendUpgradeEmail(user);
+    }
+
+    private void sendUpgradeEmail(User user) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+
+        mailMessage.setFrom("admin@ksug.org");
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Upgrade Level");
+        mailMessage.setText("Your Level was upgrade to " + user.getLevel().name());
+
+        this.mailSender.send(mailMessage);
     }
 
     @Override

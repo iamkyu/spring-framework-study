@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.mail.MailSender;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -12,14 +13,12 @@ import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static springbook.user.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
 import static springbook.user.service.UserService.MIN_RECOMMEND_FOR_GOLD;
 
@@ -41,6 +40,9 @@ public class UserServiceTest {
     @Autowired
     PlatformTransactionManager transactionManager;
 
+    @Autowired
+    MailSender mailSender;
+
     List<User> users;
 
     @Before
@@ -48,11 +50,11 @@ public class UserServiceTest {
         this.userDao = context.getBean("userDao", UserDao.class);
 
         users = Arrays.asList(
-                new User("test1", "tester1", "pass1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
-                new User("test2", "tester2", "pass2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
-                new User("test3", "tester3", "pass3", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD-1),
-                new User("test4", "tester4", "pass4", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD),
-                new User("test5", "tester5", "pass5", Level.GOLD, 100, Integer.MAX_VALUE)
+                new User("test1", "tester1", "pass1", "mail1@mail.net", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
+                new User("test2", "tester2", "pass2", "mail2@mail.net", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
+                new User("test3", "tester3", "pass3", "mail3@mail.net", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD-1),
+                new User("test4", "tester4", "pass4", "mail4@mail.net", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD),
+                new User("test5", "tester5", "pass5", "mail5@mail.net", Level.GOLD, 100, Integer.MAX_VALUE)
         );
 
         userDao.deleteAll();
@@ -92,6 +94,7 @@ public class UserServiceTest {
         TestUserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
         testUserService.setTransactionManager(transactionManager);
+        testUserService.setMailSender(this.mailSender);
 
         for (User user : users) {
             userDao.add(user);
