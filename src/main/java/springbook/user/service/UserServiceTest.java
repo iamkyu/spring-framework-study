@@ -11,12 +11,14 @@ import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static springbook.user.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
 import static springbook.user.service.UserService.MIN_RECOMMEND_FOR_GOLD;
 
@@ -34,6 +36,9 @@ public class UserServiceTest {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    DataSource dataSource;
 
     List<User> users;
 
@@ -81,12 +86,47 @@ public class UserServiceTest {
         checkLevelUpgraded(users.get(4), false);
     }
 
+    @Test
+    public void upgradeAllOrNothing() throws SQLException, ClassNotFoundException {
+        TestUserService testUserService = new TestUserService(users.get(3).getId());
+        testUserService.setUserDao(this.userDao);
+        testUserService.setDataSource(this.dataSource);
+
+        for (User user : users) {
+            userDao.add(user);
+        }
+
+        try {
+            testUserService.upgradeLevels();
+            fail("TestUserServiceException Expected");
+        } catch (TestUserServiceException e) {
+        }
+
+        checkLevelUpgraded(users.get(1), false);
+    }
+
     private void checkLevelUpgraded(User user, boolean upgraded) throws SQLException, ClassNotFoundException {
         User updatedUser = userDao.get(user.getId());
         if (upgraded) {
             assertThat(updatedUser.getLevel(), is(user.getLevel().nextLevel()));
         } else {
             assertThat(updatedUser.getLevel(), is(user.getLevel()));
+        }
+    }
+
+    static class TestUserService extends UserService {
+        private String id;
+
+        public TestUserService(String id) {
+            this.id = id;
+        }
+
+        @Override
+        public void upgradeLevel(User user) {
+            if (user.getId().equals(this.id)) {
+                throw new TestUserServiceException();
+            }
+            super.upgradeLevel(user);
         }
     }
 }
