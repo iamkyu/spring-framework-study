@@ -51,6 +51,22 @@ public class UserServiceTest {
     }
 
     @Test
+    public void add() throws SQLException, ClassNotFoundException {
+        User userWithLevel = users.get(4);
+        User userWithoutLevel = users.get(0);
+        userWithoutLevel.setLevel(null);
+
+        userService.add(userWithLevel);
+        userService.add(userWithoutLevel);
+
+        User userWithLevelRead = userDao.get(userWithLevel.getId());
+        User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
+
+        assertThat(userWithLevelRead.getLevel(), is(userWithLevel.getLevel()));
+        assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
+    }
+
+    @Test
     public void upgradeLevels() throws SQLException, ClassNotFoundException {
         for (User user : users) {
             userDao.add(user);
