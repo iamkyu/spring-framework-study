@@ -17,6 +17,7 @@ import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
+import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,9 +125,14 @@ public class UserServiceTest {
         testUserService.setUserDao(this.userDao);
         testUserService.setMailSender(this.mailSender);
 
-        UserServiceTx userServiceTx = new UserServiceTx();
-        userServiceTx.setTransactionManager(transactionManager);
-        userServiceTx.setUserService(testUserService);
+        TransactionHandler transactionHandler = new TransactionHandler();
+        transactionHandler.setTarget(testUserService);
+        transactionHandler.setTransactionManager(transactionManager);
+        transactionHandler.setPattern("upgradeLevels");
+
+        UserService userServiceTx = (UserService) Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class[] {UserService.class}, transactionHandler
+        );
 
         for (User user : users) {
             userDao.add(user);
