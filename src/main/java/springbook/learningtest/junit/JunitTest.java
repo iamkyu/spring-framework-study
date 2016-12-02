@@ -1,5 +1,6 @@
 package springbook.learningtest.junit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class JunitTest {
     static Set<JunitTest> testObjects = new HashSet<>();
     static ApplicationContext contextObject = null;
 
-    @Test
+    @Test @Ignore
     public void test1() {
         assertThat(testObjects, not(hasItem(this)));
         testObjects.add(this);
@@ -41,7 +42,8 @@ public class JunitTest {
         contextObject = this.context;
     }
 
-    @Test public void test2() {
+    @Test @Ignore
+    public void test2() {
         assertThat(testObjects, not(hasItem(this)));
         testObjects.add(this);
 
@@ -49,7 +51,8 @@ public class JunitTest {
         contextObject = this.context;
     }
 
-    @Test public void test3() {
+    @Test @Ignore
+    public void test3() {
         assertThat(testObjects, not(hasItem(this)));
         testObjects.add(this);
 

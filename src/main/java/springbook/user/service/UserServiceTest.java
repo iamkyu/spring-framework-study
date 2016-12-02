@@ -17,7 +17,6 @@ import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
-import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,7 +119,8 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeAllOrNothing() throws SQLException, ClassNotFoundException {
+    @DirtiesContext
+    public void upgradeAllOrNothing() throws Exception {
         TestUserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
         testUserService.setMailSender(this.mailSender);
@@ -130,9 +130,11 @@ public class UserServiceTest {
         transactionHandler.setTransactionManager(transactionManager);
         transactionHandler.setPattern("upgradeLevels");
 
-        UserService userServiceTx = (UserService) Proxy.newProxyInstance(
-                getClass().getClassLoader(), new Class[] {UserService.class}, transactionHandler
-        );
+        TxProxyFactoryBean txProxyFactoryBean =
+                context.getBean("&userService", TxProxyFactoryBean.class);
+        txProxyFactoryBean.setTarget(testUserService);
+
+        UserService userServiceTx = (UserService) txProxyFactoryBean.getObject();
 
         for (User user : users) {
             userDao.add(user);

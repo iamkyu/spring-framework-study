@@ -1,21 +1,26 @@
 package springbook.learningtest.proxy;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
+import org.springframework.aop.framework.ProxyFactoryBean;
 
 import java.lang.reflect.Proxy;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author Kj Nam
  * @since 2016-12-02
  */
 public class ProxyTest {
+    String name = "Kyu";
+
     @Test
     public void simpleProxy() {
         Hello hello = new HelloTarget();
-        String name = "Kyu";
+
         assertThat(hello.sayHello(name), is("Hello Kyu"));
         assertThat(hello.sayHi(name), is("Hi Kyu"));
         assertThat(hello.sayThankYou(name), is("Thank You Kyu"));
@@ -33,5 +38,25 @@ public class ProxyTest {
         assertThat(dynamicProxiedHello.sayHello(name), is("HELLO KYU"));
         assertThat(dynamicProxiedHello.sayHi(name), is("HI KYU"));
         assertThat(dynamicProxiedHello.sayThankYou(name), is("THANK YOU KYU"));
+    }
+
+    @Test
+    public void proxyFactoryBean() {
+        ProxyFactoryBean pfBean = new ProxyFactoryBean();
+        pfBean.setTarget(new HelloTarget());
+        pfBean.addAdvice(new UppercaseAdvice());
+
+        Hello proxiedHello = (Hello) pfBean.getObject();
+        assertThat(proxiedHello.sayHello(name), is("HELLO KYU"));
+        assertThat(proxiedHello.sayHi(name), is("HI KYU"));
+        assertThat(proxiedHello.sayThankYou(name), is("THANK YOU KYU"));
+    }
+
+    static class UppercaseAdvice implements MethodInterceptor {
+        @Override
+        public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+            String ret = (String) methodInvocation.proceed();
+            return ret.toUpperCase();
+        }
     }
 }
