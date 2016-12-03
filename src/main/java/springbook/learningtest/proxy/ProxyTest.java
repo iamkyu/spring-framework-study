@@ -3,6 +3,8 @@ package springbook.learningtest.proxy;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
+import org.springframework.aop.ClassFilter;
+import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -68,6 +70,42 @@ public class ProxyTest {
         assertThat(proxiedHello.sayHello(name), is("HELLO KYU"));
         assertThat(proxiedHello.sayHi(name), is("HI KYU"));
         assertThat(proxiedHello.sayThankYou(name), is("Thank You Kyu"));
+    }
+
+    @Test
+    public void classNamePointcutAdvisor() {
+        NameMatchMethodPointcut classMethodPointcut = new NameMatchMethodPointcut() {
+            @Override
+            public ClassFilter getClassFilter() {
+                return clazz -> clazz.getSimpleName().startsWith("HelloT");
+            }
+        };
+
+        classMethodPointcut.setMappedName("sayH*");
+        checkAdvice(new HelloTarget(), classMethodPointcut, true);
+
+        class HelloWorld extends HelloTarget {};
+        checkAdvice(new HelloWorld(), classMethodPointcut, false);
+
+        class HelloToby extends HelloTarget {};
+        checkAdvice(new HelloToby(), classMethodPointcut, true);
+    }
+
+    private void checkAdvice(Object target, Pointcut pointcut, boolean adviced) {
+        ProxyFactoryBean pfBean = new ProxyFactoryBean();
+        pfBean.setTarget(target);
+        pfBean.addAdvisor(new DefaultPointcutAdvisor(pointcut, new UppercaseAdvice()));
+        Hello proxiedHello = (Hello) pfBean.getObject();
+
+        if (adviced) {
+            assertThat(proxiedHello.sayHello(name), is("HELLO KYU"));
+            assertThat(proxiedHello.sayHi(name), is("HI KYU"));
+            assertThat(proxiedHello.sayThankYou(name), is("Thank You Kyu"));
+        } else {
+            assertThat(proxiedHello.sayHello(name), is("Hello Kyu"));
+            assertThat(proxiedHello.sayHi(name), is("Hi Kyu"));
+            assertThat(proxiedHello.sayThankYou(name), is("Thank You Kyu"));
+        }
     }
 
     static class UppercaseAdvice implements MethodInterceptor {
