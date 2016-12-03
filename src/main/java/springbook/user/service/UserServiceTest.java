@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
@@ -49,7 +48,10 @@ public class UserServiceTest {
     UserService userService;
 
     @Autowired
-    UserServiceImpl userServiceImpl;
+    UserService testUserService;
+
+//    @Autowired
+//    UserServiceImpl userServiceImpl;
 
     @Autowired
     PlatformTransactionManager transactionManager;
@@ -93,7 +95,7 @@ public class UserServiceTest {
     @Test
     @DirtiesContext
     public void upgradeLevels() throws SQLException, ClassNotFoundException {
-        userServiceImpl = new UserServiceImpl();
+        UserServiceImpl userServiceImpl = new UserServiceImpl();
 
         MockUserDao mockUserDao = new MockUserDao(this.users);
         userServiceImpl.setUserDao(mockUserDao);
@@ -122,27 +124,12 @@ public class UserServiceTest {
     @Test
     @DirtiesContext
     public void upgradeAllOrNothing() throws Exception {
-        TestUserService testUserService = new TestUserService(users.get(3).getId());
-        testUserService.setUserDao(this.userDao);
-        testUserService.setMailSender(this.mailSender);
-
-        TransactionHandler transactionHandler = new TransactionHandler();
-        transactionHandler.setTarget(testUserService);
-        transactionHandler.setTransactionManager(transactionManager);
-        transactionHandler.setPattern("upgradeLevels");
-
-        ProxyFactoryBean txProxyFactoryBean =
-                context.getBean("&userService", ProxyFactoryBean.class);
-        txProxyFactoryBean.setTarget(testUserService);
-
-        UserService userServiceTx = (UserService) txProxyFactoryBean.getObject();
-
         for (User user : users) {
             userDao.add(user);
         }
 
         try {
-            userServiceTx.upgradeLevels();
+            this.testUserService.upgradeLevels();
             fail("TestUserServiceException Expected");
         } catch (TestUserServiceException e) {
         }
@@ -185,12 +172,8 @@ public class UserServiceTest {
         assertThat(mailMessages.get(1).getTo()[0], is(users.get(3).getEmail()));
     }
 
-    static class TestUserService extends UserServiceImpl {
-        private String id;
-
-        public TestUserService(String id) {
-            this.id = id;
-        }
+    static class TestUserServiceImpl extends UserServiceImpl {
+        private String id = "test4";
 
         @Override
         public void upgradeLevel(User user) {

@@ -12,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
-import springbook.user.service.UserServiceImpl;
+import springbook.user.service.UserService;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -37,7 +37,7 @@ public class UserDaoTest {
     DataSource dataSource;
 
     @Autowired
-    UserServiceImpl userService;
+    UserService userService;
 
     private UserDao dao;
     private User user1;
