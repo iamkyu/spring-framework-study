@@ -20,6 +20,7 @@ import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
 import java.sql.SQLException;
+import java.sql.SQLRecoverableException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +63,7 @@ public class UserServiceTest {
     List<User> users;
 
     @Before
-    public void setUp() {
+    public void setUp() throws SQLRecoverableException {
         this.userDao = context.getBean("userDao", UserDao.class);
 
         users = Arrays.asList(
@@ -178,7 +179,7 @@ public class UserServiceTest {
     }
 
     @Test (expected = TransientDataAccessResourceException.class) @Ignore
-    public void readOnlyTransactionAttribute() {
+    public void readOnlyTransactionAttribute() throws SQLRecoverableException {
         //FIXME testUserSerivce 빈이 제대로 주입되지 않음
         testUserService.getAll();
     }
@@ -187,7 +188,7 @@ public class UserServiceTest {
         private String id = "test4";
 
         @Override
-        public void upgradeLevel(User user) {
+        public void upgradeLevel(User user) throws SQLRecoverableException {
             if (user.getId().equals(this.id)) {
                 throw new TestUserServiceException();
             }
@@ -195,7 +196,7 @@ public class UserServiceTest {
         }
 
         @Override
-        public List<User> getAll() {
+        public List<User> getAll() throws SQLRecoverableException {
             for (User user : super.getAll()) {
                 super.update(user);
             }

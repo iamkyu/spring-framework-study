@@ -8,6 +8,7 @@ import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
 import java.sql.SQLException;
+import java.sql.SQLRecoverableException;
 import java.util.List;
 
 /**
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void upgradeLevelsInternal() {
+    private void upgradeLevelsInternal() throws SQLRecoverableException {
         List<User> users = userDao.getAll();
         for (User user : users) {
             if (canUpgradeLevel(user)) {
@@ -55,7 +56,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void upgradeLevel(User user) {
+    public void upgradeLevel(User user) throws SQLRecoverableException {
         user.upgradeLevel();
         userDao.update(user);
         sendUpgradeEmail(user);
@@ -101,17 +102,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll() {
+    public List<User> getAll() throws SQLRecoverableException {
         return userDao.getAll();
     }
 
     @Override
-    public void deleteAll() {
+    public void deleteAll() throws SQLRecoverableException {
         userDao.deleteAll();
     }
 
     @Override
-    public void update(User user) {
+    public void update(User user) throws SQLRecoverableException {
         userDao.update(user);
     }
 }

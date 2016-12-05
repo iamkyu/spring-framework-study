@@ -3,6 +3,7 @@ package springbook.user.dao;
 import springbook.user.domain.User;
 
 import java.sql.SQLException;
+import java.sql.SQLRecoverableException;
 import java.util.List;
 
 /**
@@ -14,11 +15,11 @@ public interface UserDao {
 
     User get(String id) throws ClassNotFoundException, SQLException;
 
-    void deleteAll();
+    void deleteAll() throws SQLRecoverableException;
 
     int getCount() throws SQLException;
 
-    List<User> getAll();
+    List<User> getAll() throws SQLRecoverableException;
 
-    void update(User user1);
+    void update(User user1) throws SQLRecoverableException;
 }

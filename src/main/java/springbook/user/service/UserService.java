@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 import springbook.user.domain.User;
 
 import java.sql.SQLException;
+import java.sql.SQLRecoverableException;
 import java.util.List;
 
 /**
@@ -20,9 +21,9 @@ public interface UserService {
     User get(String id) throws SQLException, ClassNotFoundException;
 
     @Transactional(readOnly = true)
-    List<User> getAll();
+    List<User> getAll() throws SQLRecoverableException;
 
-    void deleteAll();
+    void deleteAll() throws SQLRecoverableException;
 
-    void update(User user);
+    void update(User user) throws SQLRecoverableException;
 }
