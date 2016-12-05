@@ -1,11 +1,13 @@
 package springbook.user.service;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -175,6 +177,12 @@ public class UserServiceTest {
         assertThat(mailMessages.get(1).getTo()[0], is(users.get(3).getEmail()));
     }
 
+    @Test (expected = TransientDataAccessResourceException.class) @Ignore
+    public void readOnlyTransactionAttribute() {
+        //FIXME testUserSerivce 빈이 제대로 주입되지 않음
+        testUserService.getAll();
+    }
+
     static class TestUserServiceImpl extends UserServiceImpl {
         private String id = "test4";
 
@@ -184,6 +192,15 @@ public class UserServiceTest {
                 throw new TestUserServiceException();
             }
             super.upgradeLevel(user);
+        }
+
+        @Override
+        public List<User> getAll() {
+            for (User user : super.getAll()) {
+                super.update(user);
+            }
+
+            return null;
         }
     }
 
