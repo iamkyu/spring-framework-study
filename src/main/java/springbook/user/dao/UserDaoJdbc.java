@@ -8,6 +8,7 @@ import springbook.user.domain.User;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -16,10 +17,10 @@ import java.util.List;
  */
 public class UserDaoJdbc implements UserDao {
     private JdbcTemplate jdbcTemplate;
-    private String sqlAdd;
+    private Map<String, String> sqlMap;
 
-    public void setSqlAdd(String sqlAdd) {
-        this.sqlAdd = sqlAdd;
+    public void setSqlMap(Map<String, String> sqlMap) {
+        this.sqlMap = sqlMap;
     }
 
     private RowMapper<User> userMapper =
@@ -42,34 +43,40 @@ public class UserDaoJdbc implements UserDao {
     @Override
     public void add(User user) throws ClassNotFoundException, SQLException {
         this.jdbcTemplate.update(
-                this.sqlAdd,
+                this.sqlMap.get("add"),
                 user.getId(), user.getName(), user.getPassword(), user.getEmail(), user.getLevel().intValue(), user.getRecommend(), user.getLogin());
     }
 
     @Override
     public void update(User user) {
-        this.jdbcTemplate.update("update users set name=?, password=?, email=?, level=?, recommend=?, login=? where id=?",
+        this.jdbcTemplate.update(
+                this.sqlMap.get("update"),
                 user.getName(), user.getPassword(), user.getEmail(), user.getLevel().intValue(), user.getRecommend(), user.getLogin(), user.getId());
     }
 
     @Override
     public User get(String id) throws ClassNotFoundException, SQLException {
-        return this.jdbcTemplate.queryForObject("select * from users where id=?",
+        return this.jdbcTemplate.queryForObject(
+                this.sqlMap.get("get"),
                 new Object[]{id}, this.userMapper);
     }
 
     @Override
     public void deleteAll() {
-        this.jdbcTemplate.update("delete from users");
+        this.jdbcTemplate.update(this.sqlMap.get("deleteAll"));
     }
 
     @Override
     public int getCount() throws SQLException {
-        return this.jdbcTemplate.queryForObject("select count(*) from users", new Object[] {}, Integer.class);
+        return this.jdbcTemplate.queryForObject(
+                this.sqlMap.get("getCount"),
+                new Object[] {}, Integer.class);
    }
 
     @Override
     public List<User> getAll() {
-        return this.jdbcTemplate.query("select * from users order by id", this.userMapper);
+        return this.jdbcTemplate.query(
+                this.sqlMap.get("getAll"),
+                this.userMapper);
     }
 }
