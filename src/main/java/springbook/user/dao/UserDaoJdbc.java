@@ -16,6 +16,11 @@ import java.util.List;
  */
 public class UserDaoJdbc implements UserDao {
     private JdbcTemplate jdbcTemplate;
+    private String sqlAdd;
+
+    public void setSqlAdd(String sqlAdd) {
+        this.sqlAdd = sqlAdd;
+    }
 
     private RowMapper<User> userMapper =
             (rs, rowNum) -> {
@@ -36,7 +41,8 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public void add(User user) throws ClassNotFoundException, SQLException {
-        this.jdbcTemplate.update("insert into users(id, name, password, email, level, recommend, login) values(?, ?, ?, ?, ?, ?, ?)",
+        this.jdbcTemplate.update(
+                this.sqlAdd,
                 user.getId(), user.getName(), user.getPassword(), user.getEmail(), user.getLevel().intValue(), user.getRecommend(), user.getLogin());
     }
 
