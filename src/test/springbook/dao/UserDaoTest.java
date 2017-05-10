@@ -1,4 +1,4 @@
-package springbook;
+package springbook.dao;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext.xml")
-public class Main {
+public class UserDaoTest {
 
     @Autowired
     private ApplicationContext context;
